@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="https//www.thymeleaf.org">
+<head>
+		<title>商品分类管理</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
+		<script th:src="@{/js/jquery-3.4.1.min.js}" type="text/javascript"></script>
+		<script th:src="@{/js/bootstrap.min.js}" type="text/javascript"></script>
+</head>
+<body>
+	<div class="container col-11">
+		<div class="row">
+			<h5>编辑商品分类</h5>
+		</div>
+		<div class ="row" th:if="${ok}">
+			<h5 class="alert alert-success" th:text="${ok}"></h5>
+		</div>
+		<div class ="row" >
+			<div class="col col-2" >
+				<a th:href="@{/edittype}">添加新分类</a>
+				<nav>
+					<!-- 使用模块碎片tree生成内容分类树 -->
+					<div th:replace="::tree(${parents},0)"></div>
+					<!-- 定义递归显示树结构的模块碎片 -->
+					<th:block th:fragment="tree(datas,level)">
+						<ul th:class="${level==0?'list-unstyled':''}">
+							<li th:each="a:${datas}">
+								<a href="javascript:void(0);"  class="getparent" th:pid="${a.tid}" th:pn="${a.name}" th:text="${a.name}"> </a>
+								<a th:href="@{|/admin/edittype/${a.tid}|}" ><img th:src="@{/images/edit.png}" alt="Edit" ></a>
+								<a th:href="@{|/admin/deletetype/${a.tid}|}" class='deletebtn'><img th:src="@{/images/remove.png}" alt="Remove" ></a>
+								<th:bolck th:if="${a.sublists}" th:replace="::tree(${a.sublists},1)"></th:bolck>
+							</li>
+						</ul>
+					</th:block>
+				</nav>
+			</div>
+			
+			<div class="col col-10" >
+			<form class="form-row" th:action="@{/savetype}" th:object="${productType}" method="POST">
+			<div class="col col-12">
+			<div class ="row" th:if="${#fields}">
+				<p class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
+					<span th:each="err : ${#fields.errors('*')}"  th:text="${err}+'&nbsp;'"></span>
+				</p>
+			</div>
+			<div class="row form-group">
+				<label for="name">分类名称</label>
+				<input type="hidden" th:field="*{tid}">
+				<input class="form-control" maxlength="25" th:field="*{name}" required placeholder="请输入内容分类名称">
+			</div>
+			<div class="row form-group" >
+				<label for="weight">权重</label>
+				<input type="number" class="form-control" th:field="*{weight}" required placeholder="请输入权重值，用于排序">
+			</div>
+			
+			<div class="row form-group" >
+				<label for="parentid">上一级</label>
+				<input type="hidden" id="parentid" th:field="*{parent.tid}">
+				<input type="text" readonly id="parentname" th:field="*{parent.name}" class="form-control-plaintext">
+			</div>
+			<div class="row form-group">
+				<button type="submit" class="btn btn-primary">保存</button>
+			</div>
+			</div>
+		</form>
+			
+			</div>
+		</div>
+		
+	</div>
+	<script type="text/javascript">
+	$(".getparent").click(function(){ //设置当前表单的上一级数据
+		var pid=$(this).attr("pid");
+		var pn= $(this).attr("pn");
+		$("#parentid").val(pid);
+		$("#parentname").val(pn);
+	});
+	$(".deletebtn").click(function(){
+		return confirm("确定要删除吗?这个操作无法恢复！");
+	})
+	</script>
+</body>
+</html>

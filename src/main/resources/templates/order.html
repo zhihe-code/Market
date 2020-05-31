@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="https//www.thymeleaf.org">
+<head>
+		<title>订单</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
+		<script th:src="@{/js/jquery-3.4.1.min.js}" type="text/javascript"></script>
+		<script th:src="@{/js/bootstrap.min.js}" type="text/javascript"></script>
+		<script th:src="@{/ue/ueditor.config.js}" type="text/javascript"></script>
+		<script th:src="@{/ue/ueditor.all.min.js}" type="text/javascript"></script>
+		<script th:src="@{/ue/lang/zh-cn/zh-cn.js}" type="text/javascript"></script>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<h5>订单</h5>
+		</div>
+		<form th:object="${product}">
+			<div class="row form-group">
+				<img th:src="*{timg}" id="timg_show" alt="">
+			</div>
+			<div class="row form-group" >
+				<p th:text="*{name}"></p>	
+			</div>
+			<div class="row form-group">
+				<label for="costprice">原价：</label>
+				<p th:text="*{costprice}+'RMB'"></p>	
+			</div>
+			<div class="row form-group">
+				<label for="price">二手价：</label>
+				<p th:text="*{price}+'RMB'"></p>	
+			</div>
+		</form>
+		<script id="imagesbrowser" type="text/plain"></script>
+		<script type="text/javascript">
+			var editor1 = UE.getEditor("contents",{});
+			var editor = UE.getEditor("imagesbrowser",{isShow:false});
+			editor.addListener("beforeExecCommand",function(a,b,c){
+				console.log(c);
+				if(b=="insertimage"){
+					$("#"+editor.mydlg).val(c[1][0].src);
+					$("#timg_show").attr("src",c[1][0].src);
+					editor.mydlg="";
+				}
+			})
+			$("#upimage").click(function(){
+				var dlg = editor.getDialog("insertimage");
+				editor.mydlg="timg";//标志（标签id实现）当前按钮打开了对话框
+				dlg.open();
+			})
+		</script>
+		<form  class="form-row" th:action="@{/saveorder}" th:object="${order}" method="POST">
+			<div class="col col-12">
+			<input type="hidden" th:field="*{oid}">
+			<div class="row form-group">
+				<label for="address">地址</label>
+				<input class="form-control" th:field="*{address}" required placeholder="请填入收货地址">
+			</div>	
+			
+			<div class="row form-group">
+				<button type="submit" class="btn btn-primary">确定</button>
+			</div>
+			
+			</div>
+		</form>
+		
+		<script id="imagesbrowser" type="text/plain"></script>
+		<script type="text/javascript">
+			var editor = UE.getEditor("imagesbrowser",{isShow:false});
+			editor.addListener("beforeExecCommand",function(a,b,c){
+				console.log(c);
+				if(b=="insertimage"){
+					$("#"+editor.mydlg).val(c[1][0].src);
+					$("#timg_show").attr("src",c[1][0].src);
+					editor.mydlg="";
+				}
+			})
+		</script>
+	</div>
+
+</body>
+</html>

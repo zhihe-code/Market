@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="https//www.thymeleaf.org">
+<head>
+<title>校园二手</title>
+<meta charset="UTF-8">
+<!-- initial-scale	设置页面的初始缩放值 -->
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<!-- jQuery的js文件必须出现在bootstrap的前面 -->
+<script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+<script src="js/bootstrap.min.js" type="text/javascript"></script>
+<script src="js/vue.min.js" type="text/javascript"></script>
+		<script th:src="@{/ue/ueditor.config.js}" type="text/javascript"></script>
+		<script th:src="@{/ue/ueditor.all.min.js}" type="text/javascript"></script>
+		<script th:src="@{/ue/lang/zh-cn/zh-cn.js}" type="text/javascript"></script>
+
+</head>
+<body>
+	<div id="vueroot">
+		<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+			<h5 class="my-0 mr-md-auto font-weight-normal">
+				<img src="images/log.png" alt="logo">
+			</h5>
+			<div th:if="${#session.getAttribute('user')==null}">
+			<nav class="my-2 my-md-0 mr-md-3">
+				<a class="p-2 text-dark" href="#">首页</a> 
+				<a class="p-2 text-dark" href="#">关于我们</a> 
+				<a class="p-2 text-dark" href="#">支持我们</a> 
+				<a class="p-2 text-dark" href="#">占住位置</a>
+				<button type="button" class="btn btn-primary" data-toggle="modal"
+					data-target="#loginModalCenter">登陆</button>
+				<button type="button" class="btn btn-light" data-toggle="modal"
+					data-target="#registerModalCenter">注册</button>
+			</nav>
+			</div>
+			<div  th:if="${#session.getAttribute('user')!=null}"   >
+			<nav class="row ">
+				<a th:href="@{/editproduct}" class=" btn btn-primary">发布商品</a>
+				<p class="p-1  ">欢迎</p>
+				<span class="p-1 " th:text="${#session.getAttribute('user').account}"></span>
+				
+				<button onclick="javascript:logout();" type="submit" class=" btn btn-light">退出</button>
+			</nav>
+
+			</div>
+			<script type="text/javascript">
+			function logout(){
+				var result = confirm("确定要退出吗？");
+				if(result){
+					location.href="/logout";
+				}
+			}
+			</script>
+
+
+
+		</div>
+		<!-- Model -->
+		<div class="modal fade" id="loginModalCenter" tabindex="-1"
+			role="dialog" aria-labelledby="loginModalCenter" aria-hidden="true"
+			>
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="loginModalCenterTitle">登陆</h5>
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form th:action="@{/index}" th:object="${userLogin}" method="POST">
+							<div class="form-group">
+								<label for="account">账号:</label><input class="form-control"
+									maxlength="20" th:field="*{account}" required
+									placeholder="请输入账号" id="l_account">
+							</div>
+							<div class="form-group">
+								<label for="password">密码:</label> <input type="password"
+									maxlength="20" class="form-control" th:field="*{password}"
+									required placeholder="请输入密码" id="l_password">
+							</div>
+							<div class="form-group col-md-4 ml-auto">
+								<button id="btn_login" type="submit" class="btn btn-primary">登陆</button>
+								<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">取消</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="registerModalCenter" tabindex="-1"
+			role="dialog" aria-labelledby="registerModalCenter"
+			aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg"
+				role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="registerModalCenterTitle">注册</h5>
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form th:action="@{/register}" th:object="${user}" method="POST" th:if="${#session.getAttribute('user')==null}">
+								<div class="form-group">
+									<label for="account">账号:</label> <input type="hidden"
+										th:field="*{uid}">  <input
+										class="form-control" maxlength="20" th:field="*{account}"
+										required placeholder="请输入账号">
+								</div>
+								<div class="form-group">
+									<!--  -->
+									<label for="password">密码:</label> <input type="password"
+										maxlength="20" class="form-control" th:field="*{password}"
+										required placeholder="请输入密码">
+								</div>
+								<div class="form-group">
+									<label for="name">姓名:</label> <input type="text"
+										class="form-control" th:field="*{name}">
+								</div>
+								<div class="form-group">
+									<label for="sex">性别:</label> <select th:field="*{grander}"
+										class="custom-select d-block w-100" required>
+										<option th:each="a:${sexes}" th:text="${a}" th:value="${a}">
+										</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="birthday">出生日期:</label> <input type="date"
+										th:field="*{birthday}" class="form-control">
+								</div>
+								<div class="form-group">
+									<label for="mobile">手机:</label> <input type="text"
+										class="form-control" th:field="*{mobile}" maxlength="11">
+								</div>
+								<div class="form-group">
+									<label for="email">电子邮件:</label> <input type="email"
+										class="form-control" th:field="*{email}" maxlength="100">
+									<input type="hidden" th:field="*{validstate}">
+								</div>
+								<div class="form-group col-md-4 ml-auto">
+									<button id="btn_register" type="submit" class="btn btn-primary">注册</button>
+									<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">取消</button>
+								</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+				
+		<div class="alert alert-success alert-dismissible fade show"
+			th:unless="${#strings.isEmpty(ok)}" role="alert">
+			<strong th:text="${ok}"></strong>
+			<button type="button" class="close" data-dismiss="alert"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		
+		<div class="alert alert-danger alert-dismissible fade show"
+			th:unless="${#strings.isEmpty(fail)}" role="alert">
+			<strong th:text="${fail}"></strong>
+			<button type="button" class="close" data-dismiss="alert"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+
+
+		<div class="container">
+
+			<div class="row">
+				<div class="col-md-4" th:each="p:${pages.content}">
+					<div class="card mb-4 shadow-sm">
+
+						<img height="300px" th:src="${p.timg}" id="timg_show" alt="图片">
+
+
+						<div class="card-body">
+							<div class="row">
+		
+							<p class="col-8" th:text="${p.name}"></p>
+							<p  th:text="${p.price}+' RMB'"></p>
+							</div>
+
+							<p class="card-text" th:text="${p.contents}"></p>
+							<div class="d-flex justify-content-between align-items-center">
+								<div class="btn-group">
+									<a th:if="${#session.getAttribute('user')!=null}" 
+										th:href="@{|/order/${p.pid}|}" class="btn btn-sm btn-outline-secondary">购买</a>
+									<a th:if="${#session.getAttribute('user')==null}" 
+									href="#" class="btn btn-sm btn-outline-secondary">购买</a>
+								</div>
+								<small class="text-muted" th:text="${p.pubdate}"></small>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script id="imagesbrowser" type="text/plain"></script>
+				<script type="text/javascript">
+					var editor = UE.getEditor("imagesbrowser", {
+						isShow : false,
+						isHidden:true
+					});
+					editor.addListener("beforeExecCommand", function(a, b, c) {
+						console.log(c);
+						$("#" + editor.mydlg).val(c[1][0].src);
+						$("#timg_show").attr("src", c[1][0].src);
+						editor.mydlg = "";
+					})
+				</script>
+
+			</div>
+		</div>
+		<footer class="text-muted">
+			<div class="container">
+				<p class="float-right">
+					<a href="#">Back to top</a>
+				</p>
+				<p >Copyright © X2017011307</p>
+			</div>
+		</footer>
+	</div>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+insert into users (account,password,name,grander,mobile,validstate,role) values('sysadmin','123456','Administrator',0,'15321707130',2,2);
+insert into users (account,password,name,grander,mobile,validstate,role) values('123456','123456','User',0,'15612341234',0,0);
+insert into users (account,password,name,grander,mobile,validstate,role) values('1234567','1234567','User',0,'15612341234',2,0);
+insert into producttype (name,weight) values('运动','1');
+insert into producttype (name,weight) values('男装','1');
+insert into producttype (name,weight) values('女装','1');
+insert into products(name,price,validstate) values('Spring','1000',2);
+insert into products(name,price,validstate) values('Summer','1000',2);
+insert into products(name,price,validstate) values('Autumn','1000',0);
+insert into products(name,price,validstate) values('Winter','1000',0);

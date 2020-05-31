@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="https//www.thymeleaf.org">
+<head>
+		<title>添加/编辑内容</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
+		<script th:src="@{/js/jquery-3.4.1.min.js}" type="text/javascript"></script>
+		<script th:src="@{/js/bootstrap.min.js}" type="text/javascript"></script>
+		<script th:src="@{/ue/ueditor.config.js}" type="text/javascript"></script>
+		<script th:src="@{/ue/ueditor.all.min.js}" type="text/javascript"></script>
+		<script th:src="@{/ue/lang/zh-cn/zh-cn.js}" type="text/javascript"></script>
+</head>
+<body>
+	<div class="container col-11">
+		<div class="row">
+			<h5>发布商品</h5>
+		</div>
+		<div class="row" th:if="${ok}">
+			<h5 class="alert alert-success" th:text="${ok}"></h5>
+		</div>
+		<form class="form-row" th:action="@{/saveproduct}" th:object="${product}" method="POST">
+			<div class="col col-12">
+			<div class="row form-group">
+				<label for="name">商品名</label>
+				<input type="hidden" th:field="*{pid}">
+				<input th:if="${#session.getAttribute('user').account!=null}" type="hidden" th:field="*{user}">
+				<input class="form-control" th:field="*{name}" required placeholder="请输入商品的名称">
+			</div>
+			<div class="row form-group">
+				<label for="timg">商品展示图</label>
+				<input type="text" class="form-control" th:field="*{timg}" placeholder="请选择商品的图片">
+				<img th:src="*{timg}" id="timg_show" alt="">
+				<a href="javascript:void(0)" class="btn btn-primary" id="upimage">浏览...</a>
+			</div>
+			
+			<div class="row form-group">
+				<label for="producttype">分类</label>
+				<select class="form-control" th:field="*{type.tid}">
+					<option value=""></option>
+					<option th:replace="::tree(${types},1)"></option>
+				</select>
+				<th:block th:fragment="tree(datas,level)">
+					<th:block th:each="d:${datas}">
+					<option th:text="${@utils.numstr('-',level)+d.name}" th:value="${d.tid}"></option>
+					<th:block th:if="${d.sublists}" th:replace="this::tree(${d.sublists},${level*4})"></th:block>					
+					</th:block>
+				</th:block>
+			</div>
+			
+			
+			<div class="row form-group">
+				<label for="costprice">原价</label>
+				<input  type="number"  th:field="*{costprice}" class="form-control">
+			</div>
+			
+			<div class="row form-group">
+				<label for="price">二手价</label>
+				<input  type="number"  th:field="*{price}" class="form-control">
+			</div>
+			
+			<div class="row form-group">
+				<label for="contents">商品描述</label>
+				<textarea id="contents" th:field="*{contents}"></textarea>
+			</div>
+			
+			<div class="row form-group">
+				<button type="submit" class="btn btn-primary">发布</button>
+			</div>
+			
+			</div>
+		</form>
+		
+		<script id="imagesbrowser" type="text/plain"></script>
+		<script type="text/javascript">
+			var editor1 = UE.getEditor("contents",{});
+			var editor = UE.getEditor("imagesbrowser",{isShow:false});
+			editor.addListener("beforeExecCommand",function(a,b,c){
+				console.log(c);
+				if(b=="insertimage"){
+					$("#"+editor.mydlg).val(c[1][0].src);
+					$("#timg_show").attr("src",c[1][0].src);
+					editor.mydlg="";
+				}
+			})
+			$("#upimage").click(function(){
+				var dlg = editor.getDialog("insertimage");
+				editor.mydlg="timg";//标志（标签id实现）当前按钮打开了对话框
+				dlg.open();
+			})
+		</script>
+	</div>
+
+</body>
+</html>
